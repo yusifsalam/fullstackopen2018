@@ -1,1 +1,1 @@
-Osa 1, tehtävät 1.1 ja 1.2
+Osa 1, tehtävät 1.3, 1.4, ja 1.5
