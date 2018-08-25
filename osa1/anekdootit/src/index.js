@@ -6,33 +6,50 @@ class App extends React.Component {
         super(props)
         this.state = {
             selected: 0,
-            pisteet: 0
+            pisteet: 0,
+            eniten: 0
         }
     }
 
-    pisteet = [0,0,0,0,0,0]
+    pisteet = [0, 0, 0, 0, 0, 0]
+    maxNumber = 0
+    maxIndex = 0
 
     render() {
+        const findMaxIndex = () => {
+            for (let i = 0; i < this.pisteet.length; i++) {
+                if (this.pisteet[i] > this.maxNumber) {
+                    this.maxNumber = this.pisteet[i]
+                    this.maxIndex = i
+                }
+            }
+        }
         const selectAnecdote = () => {
-            let number = Math.floor(Math.random()*6)
-            console.log(this.pisteet)
+            let number = Math.floor(Math.random() * 6)
+            findMaxIndex()
             this.setState({
-                selected : number, 
-                pisteet : this.pisteet[number]
+                selected: number,
+                pisteet: this.pisteet[number],
+                eniten: this.maxIndex
             })
         }
-        const voteUp  = () => {
+        const voteUp = () => {
             this.pisteet[this.state.selected] += 1
+            findMaxIndex()
             this.setState({
-                pisteet: this.pisteet[this.state.selected]
+                pisteet: this.pisteet[this.state.selected],
+                eniten: this.maxIndex
             })
         }
         return (
             <div>
-                <p>{this.props.anecdotes[this.state.selected]}</p>
-                <p>has {this.state.pisteet} votes</p>
-                <button onClick = {voteUp}>vote</button>
-                <button onClick = {selectAnecdote}>next anecdote</button>
+                <p>{this.props.anecdotes[this.state.selected]}<br></br>
+                    has {this.state.pisteet} votes</p>
+                <button onClick={voteUp}>vote</button>
+                <button onClick={selectAnecdote}>next anecdote</button>
+                <h1>anecdote with most votes:</h1>
+                <p>{this.props.anecdotes[this.state.eniten]}<br></br>
+                    has {this.pisteet[this.state.eniten]} votes </p>
             </div>
         )
     }
