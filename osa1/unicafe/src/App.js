@@ -20,6 +20,14 @@ class App extends Component {
     )
 
     const Statistics = () => {
+      if ((this.state.huono + this.state.neutraali + this.state.hyva) === 0){
+        return (
+          <div>
+            <h1>statistiikka</h1>
+            <p>ei yhtään palautetta annettu</p>
+          </div>
+        )
+      }
       return (
         <div>
           <h1>statistiikka</h1>
