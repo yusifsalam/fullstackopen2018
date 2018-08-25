@@ -11,6 +11,28 @@ class App extends Component {
     }
   }
   render() {
+    const Button = ({ handleClick, text }) => (
+      <button onClick={handleClick}>{text}</button>
+    )
+
+    const Statistic = ({ text, value, trailingText }) => (
+      <p>{text} {value} {trailingText}</p>
+    )
+
+    const Statistics = () => {
+      return (
+        <div>
+          <h1>statistiikka</h1>
+          <Statistic text = "hyvä" value = {this.state.hyva}/>
+          <Statistic text = "neutraali" value = {this.state.neutraali}/>
+          <Statistic text = "huono" value = {this.state.huono}/>
+          <Statistic text = "keskiarvo" value = {calculateKA().toFixed(1)}/>
+          <Statistic text = "positiivisia" value = {(this.state.hyva / (this.state.hyva + this.state.neutraali + this.state.huono)
+          * 100).toFixed(1)} trailingText = "%"/>
+        </div>
+      )
+    }
+
     const addHyva = () => () => {
       this.setState({ hyva: this.state.hyva + 1 })
     }
@@ -32,16 +54,10 @@ class App extends Component {
     return (
       <div>
         <h1>anna palautetta</h1>
-        <button onClick={addHyva()}>hyvä</button>
-        <button onClick={addNeutraali()}>neutraali</button>
-        <button onClick={addHuono()}>huono </button>
-        <h1>statistiikka</h1>
-        <p>hyvä {this.state.hyva}</p>
-        <p>neutraali {this.state.neutraali}</p>
-        <p>huono {this.state.huono}</p>
-        <p>keskiarvo {calculateKA().toFixed(1)}</p>
-        <p>positiivisia {(this.state.hyva / (this.state.hyva + this.state.neutraali + this.state.huono)
-          * 100).toFixed(1)} %</p>
+        <Button handleClick={addHyva()} text="hyvä" />
+        <Button handleClick={addNeutraali()} text="neutraali" />
+        <Button handleClick={addHuono()} text="huono" />
+        <Statistics />
       </div>
     );
   }
