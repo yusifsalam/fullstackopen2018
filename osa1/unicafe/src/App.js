@@ -16,11 +16,15 @@ class App extends Component {
     )
 
     const Statistic = ({ text, value, trailingText }) => (
-      <p>{text} {value} {trailingText}</p>
+      <tr>
+        <td>
+          {text} {value} {trailingText}
+        </td>
+      </tr>
     )
 
     const Statistics = () => {
-      if ((this.state.huono + this.state.neutraali + this.state.hyva) === 0){
+      if ((this.state.huono + this.state.neutraali + this.state.hyva) === 0) {
         return (
           <div>
             <h1>statistiikka</h1>
@@ -31,12 +35,18 @@ class App extends Component {
       return (
         <div>
           <h1>statistiikka</h1>
-          <Statistic text = "hyvä" value = {this.state.hyva}/>
-          <Statistic text = "neutraali" value = {this.state.neutraali}/>
-          <Statistic text = "huono" value = {this.state.huono}/>
-          <Statistic text = "keskiarvo" value = {calculateKA().toFixed(1)}/>
-          <Statistic text = "positiivisia" value = {(this.state.hyva / (this.state.hyva + this.state.neutraali + this.state.huono)
-          * 100).toFixed(1)} trailingText = "%"/>
+          <table>
+            <tbody>
+              <Statistic text="hyvä" value={this.state.hyva} />
+              <Statistic text="neutraali" value={this.state.neutraali} />
+              <Statistic text="huono" value={this.state.huono} />
+              <Statistic text="keskiarvo" value={calculateKA().toFixed(1)} />
+              <Statistic text="positiivisia" value={(this.state.hyva /
+                (this.state.hyva + this.state.neutraali + this.state.huono)
+                * 100).toFixed(1)} trailingText="%" />
+            </tbody>
+
+          </table>
         </div>
       )
     }
