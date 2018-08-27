@@ -6,14 +6,14 @@ class App extends React.Component {
     super(props)
     this.state = {
       persons: [
-        {
-          name: 'Arto Hellas',
-          id: 1,
-          number: '040-123456'
-        }
+        { name: 'Arto Hellas', number: '040-123456' },
+        { name: 'Martti Tienari', number: '040-123456' },
+        { name: 'Arto Järvinen', number: '040-123456' },
+        { name: 'Lea Kutvonen', number: '040-123456' }
       ],
       newName: '',
-      newNumber: ''
+      newNumber: '',
+      filter: ''
     }
   }
 
@@ -47,20 +47,28 @@ class App extends React.Component {
     this.setState({ newName: event.target.value })
   }
   handlePersonNumber = (event) => {
-    this.setState({newNumber: event.target.value})
+    this.setState({ newNumber: event.target.value })
+  }
+
+  handleSearch = (event) => {
+    this.setState({filter: event.target.value})
   }
 
   render() {
     return (
       <div>
-        debug: {this.state.newName}
+        {/* debug: name: {this.state.newName} number: {this.state.newNumber} filter: {this.state.filter} */}
         <h2>Puhelinluettelo</h2>
+        <div>
+          rajaa näytettäviä <input onChange = {this.handleSearch}/>
+        </div>
+        <h2>Lisää uusi</h2>
         <form>
           <div>
-            nimi: <input onChange={this.handlePersonName} value = {this.state.newName}/>
+            nimi: <input onChange={this.handlePersonName} value={this.state.newName} />
           </div>
           <div>
-            numero: <input onChange={this.handlePersonNumber} value = {this.state.newNumber}/>
+            numero: <input onChange={this.handlePersonNumber} value={this.state.newNumber} />
           </div>
           <div>
             <button type="submit" onClick={this.addPerson}>lisää</button>
@@ -68,7 +76,7 @@ class App extends React.Component {
         </form>
         <h2>Numerot</h2>
         <ul>
-          {this.state.persons.map(person => <Person key={person.id} person={person} />)}
+          {this.state.persons.filter(person => person.name.toLowerCase().includes(this.state.filter)).map(person => <Person key={person.name} person={person}/>)} 
         </ul>
       </div>
     )
