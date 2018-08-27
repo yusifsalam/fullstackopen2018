@@ -1,5 +1,7 @@
 import React from 'react'
 import Person from './components/Person'
+import Search from './components/Search'
+import PersonForm from './components/PersonForm'
 
 class App extends React.Component {
   constructor(props) {
@@ -59,21 +61,10 @@ class App extends React.Component {
       <div>
         {/* debug: name: {this.state.newName} number: {this.state.newNumber} filter: {this.state.filter} */}
         <h2>Puhelinluettelo</h2>
-        <div>
-          rajaa näytettäviä <input onChange = {this.handleSearch}/>
-        </div>
+        <Search handleSearch = {this.handleSearch}/>
         <h2>Lisää uusi</h2>
-        <form>
-          <div>
-            nimi: <input onChange={this.handlePersonName} value={this.state.newName} />
-          </div>
-          <div>
-            numero: <input onChange={this.handlePersonNumber} value={this.state.newNumber} />
-          </div>
-          <div>
-            <button type="submit" onClick={this.addPerson}>lisää</button>
-          </div>
-        </form>
+        <PersonForm personName = {this.handlePersonName} newName = {this.newName}
+        personNumber = {this.handlePersonNumber} newNumber ={this.newNumber} addPerson = {this.addPerson}/>
         <h2>Numerot</h2>
         <ul>
           {this.state.persons.filter(person => person.name.toLowerCase().includes(this.state.filter)).map(person => <Person key={person.name} person={person}/>)} 
