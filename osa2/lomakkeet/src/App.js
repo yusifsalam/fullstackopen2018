@@ -22,11 +22,20 @@ class App extends React.Component {
       date: new Date().toISOString,
       id: this.state.persons.length + 1
     }
-    const persons = this.state.persons.concat(personObject)
-    this.setState({
-      persons,
-      newName: ''
-    })
+    if (this.state.persons.filter(person => person.name === personObject.name).length > 0) {
+      alert("person already added!")
+      this.setState({
+        persons: this.state.persons,
+        newName: ''
+      })
+    }
+    else {
+      const persons = this.state.persons.concat(personObject)
+      this.setState({
+        persons: persons,
+        newName: ''
+      })
+    }
   }
 
   handlePersonChange = (event) => {
@@ -40,7 +49,7 @@ class App extends React.Component {
         <h2>Puhelinluettelo</h2>
         <form>
           <div>
-            nimi: <input onChange={this.handlePersonChange} />
+            nimi: <input onChange={this.handlePersonChange} value = {this.state.newName}/>
           </div>
           <div>
             <button type="submit" onClick={this.addPerson}>lisää</button>
