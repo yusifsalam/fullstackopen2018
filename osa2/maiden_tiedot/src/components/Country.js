@@ -1,8 +1,13 @@
 import React from 'react';
+// import CountryFull from './CountryFull'
 
-const Country = ({country}) => {
+const Country = ({ country }) => {
+
+
     return (
-        <li> {country.name}</li>
+        <div>
+            {country.name}
+        </div>
     );
 };
 
