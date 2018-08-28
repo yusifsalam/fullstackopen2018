@@ -28,7 +28,6 @@ class App extends React.Component {
     const personObject = {
       name: this.state.newName,
       number: this.state.newNumber,
-      date: new Date().toISOString(),
       id: this.state.persons.length + 1
     }
     if (this.state.persons.filter(person => person.name === personObject.name).length > 0) {
@@ -40,12 +39,12 @@ class App extends React.Component {
       })
     }
     else {
-      const persons = this.state.persons.concat(personObject)
-      this.setState({
-        persons: persons,
-        newName: '',
-        newNumber: ''
-      })
+      axios.post('http://localhost:3001/persons', personObject)
+        .then(response => {this.setState({
+          persons: this.state.persons.concat(personObject),
+          newName: '',
+          newNumber: ''
+        })})
     }
   }
 
