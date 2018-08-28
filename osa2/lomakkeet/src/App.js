@@ -2,7 +2,7 @@ import React from 'react'
 import Person from './components/Person'
 import Search from './components/Search'
 import PersonForm from './components/PersonForm'
-import axios from 'axios'
+import personService from './services/persons'
 
 class App extends React.Component {
   constructor(props) {
@@ -16,8 +16,7 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    axios
-      .get('http://localhost:3001/persons')
+    personService.getAll()
       .then(response => {
         this.setState({persons: response.data})
       })
@@ -39,7 +38,7 @@ class App extends React.Component {
       })
     }
     else {
-      axios.post('http://localhost:3001/persons', personObject)
+      personService.create(personObject)
         .then(response => {this.setState({
           persons: this.state.persons.concat(personObject),
           newName: '',
