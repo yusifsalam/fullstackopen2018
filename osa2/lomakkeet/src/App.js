@@ -15,10 +15,10 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     personService.getAll()
       .then(response => {
-        this.setState({persons: response.data})
+        this.setState({ persons: response.data })
       })
   }
 
@@ -39,11 +39,13 @@ class App extends React.Component {
     }
     else {
       personService.create(personObject)
-        .then(response => {this.setState({
-          persons: this.state.persons.concat(personObject),
-          newName: '',
-          newNumber: ''
-        })})
+        .then(response => {
+          this.setState({
+            persons: this.state.persons.concat(personObject),
+            newName: '',
+            newNumber: ''
+          })
+        })
     }
   }
 
@@ -55,7 +57,26 @@ class App extends React.Component {
   }
 
   handleSearch = (event) => {
-    this.setState({filter: event.target.value})
+    this.setState({ filter: event.target.value })
+  }
+
+  handleDeletePerson = (id, name) => {
+    return () => {
+      if (window.confirm(`poistetaanko ${name}`)){
+
+        personService.deletePerson(id)
+          .then(deletedPersons => {
+            const persons = this.state.persons.filter(n => n.id !== id)
+            this.setState(
+              {
+                persons: persons,
+                newName: '',
+                newNumber: ''
+              })
+          })
+      }
+      
+    }
   }
 
   render() {
@@ -63,13 +84,13 @@ class App extends React.Component {
       <div>
         {/* debug: name: {this.state.newName} number: {this.state.newNumber} filter: {this.state.filter} */}
         <h2>Puhelinluettelo</h2>
-        <Search handleSearch = {this.handleSearch}/>
+        <Search handleSearch={this.handleSearch} />
         <h2>Lisää uusi</h2>
-        <PersonForm personName = {this.handlePersonName} newName = {this.newName}
-        personNumber = {this.handlePersonNumber} newNumber ={this.newNumber} addPerson = {this.addPerson}/>
+        <PersonForm personName={this.handlePersonName} newName={this.state.newName}
+          personNumber={this.handlePersonNumber} newNumber={this.state.newNumber} addPerson={this.addPerson} />
         <h2>Numerot</h2>
         <ul>
-          {this.state.persons.filter(person => person.name.toLowerCase().includes(this.state.filter)).map(person => <Person key={person.name} person={person}/>)} 
+          {this.state.persons.filter(person => person.name.toLowerCase().includes(this.state.filter)).map(person => <Person key={person.name} person={person} deletePerson={this.handleDeletePerson(person.id, person.name)} />)}
         </ul>
       </div>
     )
