@@ -3,6 +3,7 @@ import Person from './components/Person'
 import Search from './components/Search'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 class App extends React.Component {
   constructor(props) {
@@ -11,7 +12,8 @@ class App extends React.Component {
       persons: [],
       newName: '',
       newNumber: '',
-      filter: ''
+      filter: '',
+      notificationMessage: null
     }
   }
 
@@ -38,6 +40,17 @@ class App extends React.Component {
           this.setState({
             persons: persons.concat(changedPerson.data),
             newName: '',
+            newNumber: '',
+            notificationMessage : `muutettiin ${personObject.name} numeroa`
+          })
+          setTimeout(()=> {
+            this.setState({notificationMessage: null})
+          }, 5000)
+        }).catch(e => {
+          this.setState({
+            notificationMessage: `${personObject.name} jo poistettu palvelimelta`,
+            persons: this.state.persons.filter(n => n.name !== personObject.name),
+            newName:'',
             newNumber: ''
           })
         })
@@ -49,8 +62,12 @@ class App extends React.Component {
           this.setState({
             persons: this.state.persons.concat(personObject),
             newName: '',
-            newNumber: ''
+            newNumber: '', 
+            notificationMessage: `lisättiin ${personObject.name}`
           })
+          setTimeout(()=>{
+            this.setState({notificationMessage: null})
+          }, 5000)
         })
     }
   }
@@ -76,8 +93,20 @@ class App extends React.Component {
               {
                 persons: persons,
                 newName: '',
-                newNumber: ''
+                newNumber: '', 
+                notificationMessage: `${name} poistettu`
               })
+              setTimeout(() => {
+                this.setState({notificationMessage: null})
+              }, 5000);
+          }).catch(error =>{
+            this.setState({
+              notificationMessage: `${name} jo poistettu!`,
+              persons: this.state.persons.filter(n=> n.id !== id)
+            })
+            setTimeout(() => {
+              this.setState({notificationMessage: null})
+            }, 5000);
           })
       }
 
@@ -89,6 +118,7 @@ class App extends React.Component {
       <div>
         {/* debug: name: {this.state.newName} number: {this.state.newNumber} filter: {this.state.filter} */}
         <h2>Puhelinluettelo</h2>
+        <Notification message = {this.state.notificationMessage} />
         <Search handleSearch={this.handleSearch} />
         <h2>Lisää uusi</h2>
         <PersonForm personName={this.handlePersonName} newName={this.state.newName}
