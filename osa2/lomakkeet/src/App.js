@@ -30,12 +30,18 @@ class App extends React.Component {
       id: this.state.persons.length + 1
     }
     if (this.state.persons.filter(person => person.name === personObject.name).length > 0) {
-      alert("person already added!")
-      this.setState({
-        persons: this.state.persons,
-        newName: '',
-        newNumber: ''
-      })
+      if (window.confirm(`${personObject.name} on jo luettelossa, korvataanko vanha numero uudella?`)){
+        const person = this.state.persons.find(n => n.name === this.state.newName)
+        const changedPerson = {...person, number:this.state.newNumber}
+        personService.update(person.id, changedPerson).then(changedPerson => {
+          const persons = this.state.persons.filter(n=> n.name !== personObject.name)
+          this.setState({
+            persons: persons.concat(changedPerson.data),
+            newName: '',
+            newNumber: ''
+          })
+        })
+      }
     }
     else {
       personService.create(personObject)
@@ -62,8 +68,7 @@ class App extends React.Component {
 
   handleDeletePerson = (id, name) => {
     return () => {
-      if (window.confirm(`poistetaanko ${name}`)){
-
+      if (window.confirm(`poistetaanko ${name}`)) {
         personService.deletePerson(id)
           .then(deletedPersons => {
             const persons = this.state.persons.filter(n => n.id !== id)
@@ -75,7 +80,7 @@ class App extends React.Component {
               })
           })
       }
-      
+
     }
   }
 
