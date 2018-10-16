@@ -6,7 +6,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const middleware = require("./utils/middleware");
 const blogsRouter = require("./controllers/blogs");
+const userRouter = require('./controllers/users')
 const config = require('./utils/config')
+const loginRouter = require('./controllers/login')
 
 mongoose.connect(
   config.mongoUrl,
@@ -21,8 +23,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("build"));
 // app.use(middleware.logger);
-app.use('/api/blogs', blogsRouter);
-// app.use(middleware.error);
+app.use('/api/blogs', blogsRouter)
+app.use('/api/users', userRouter)
+app.use('/api/login', loginRouter)
+app.use(middleware.error);
 
 const server = http.createServer(app)
 
