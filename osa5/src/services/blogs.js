@@ -9,7 +9,7 @@ const getAll = () => {
 }
 
 const setToken = (newToken) => {
-  token = `bearer %{newToken}`
+  token = `bearer ${newToken}`
 }
 
 const create = async (newObject) => {

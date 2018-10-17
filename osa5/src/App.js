@@ -2,6 +2,7 @@ import React from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import Notification from './components/Notification'
 
 class App extends React.Component {
   constructor(props) {
@@ -57,6 +58,12 @@ class App extends React.Component {
     try {
       window.localStorage.removeItem("loggedBlogAppUser");
       console.log("logged out");
+      this.setState({
+        erorr: 'logged out'
+      })
+      setTimeout(() => {
+        this.setState({erorr: null})
+      },3000)
     } catch (exception) {
       console.log(exception);
     }
@@ -80,8 +87,12 @@ class App extends React.Component {
             newBlogAuthor: '',
             newBlogTitle:'',
             newBlogURL:'',
-            newBlogLikes:0
+            newBlogLikes:0, 
+            error: `a new blog ${blogObject.title} by ${blogObject.author} added`
           })
+          setTimeout(() => {
+            this.setState({error: null})
+          }, 3000)
         })
     } catch (exception) {
       console.log(exception);
@@ -159,6 +170,8 @@ class App extends React.Component {
 
     return (
       <div>
+        <h1> Blogilistat</h1>
+        <Notification message={this.state.error} />
         {this.state.user === null ? (
           loginForm()
         ) : (
