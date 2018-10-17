@@ -2,7 +2,8 @@ import React from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
-import Notification from './components/Notification'
+import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
 
 class App extends React.Component {
   constructor(props) {
@@ -59,11 +60,11 @@ class App extends React.Component {
       window.localStorage.removeItem("loggedBlogAppUser");
       console.log("logged out");
       this.setState({
-        erorr: 'logged out'
-      })
+        erorr: "logged out"
+      });
       setTimeout(() => {
-        this.setState({erorr: null})
-      },3000)
+        this.setState({ erorr: null });
+      }, 3000);
     } catch (exception) {
       console.log(exception);
     }
@@ -72,28 +73,26 @@ class App extends React.Component {
   addBlog = event => {
     event.preventDefault();
     try {
-      console.log(this.state.user.token)
+      console.log(this.state.user.token);
       const blogObject = {
         title: this.state.newBlogTitle,
         author: this.state.newBlogAuthor,
         url: this.state.newBlogURL,
         user: this.state.user._id
-      }
-      blogService
-        .create(blogObject)
-        .then(newBlog => {
-          this.setState({
-            blogs: this.state.blogs.concat(newBlog),
-            newBlogAuthor: '',
-            newBlogTitle:'',
-            newBlogURL:'',
-            newBlogLikes:0, 
-            error: `a new blog ${blogObject.title} by ${blogObject.author} added`
-          })
-          setTimeout(() => {
-            this.setState({error: null})
-          }, 3000)
-        })
+      };
+      blogService.create(blogObject).then(newBlog => {
+        this.setState({
+          blogs: this.state.blogs.concat(newBlog),
+          newBlogAuthor: "",
+          newBlogTitle: "",
+          newBlogURL: "",
+          newBlogLikes: 0,
+          error: `a new blog ${blogObject.title} by ${blogObject.author} added`
+        });
+        setTimeout(() => {
+          this.setState({ error: null });
+        }, 3000);
+      });
     } catch (exception) {
       console.log(exception);
     }
@@ -107,32 +106,74 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  handleLike = id => {
+    return () => {
+      const blog = this.state.blogs.find(b => b.id === id);
+      const changedBlog = { ...blog, likes: blog.likes + 1 };
+      console.log(changedBlog);
+      blogService
+        .update(id, changedBlog)
+        .then(changedBlog => {
+          this.setState({
+            blogs: this.state.blogs.map(
+              blog => (blog.id !== id ? blog : changedBlog)
+            )
+          });
+        })
+        .catch(error => {
+          this.setState({
+            error: `blog ${blog.title} has already been removed`,
+            blogs: this.state.blogs.filter(b => b.id !== id)
+          });
+          setTimeout(() => {
+            this.setState({ error: null });
+          }, 5000);
+        });
+    };
+  };
+
+  handleDelete = id => {
+    return () => {
+      const blog = this.state.blogs.find(b => b.id === id);
+      if (window.confirm(`do you really want to delete ${blog.title} ?`)) {
+        blogService
+          .deleteBlog(id)
+          .then(b => {
+            this.setState({
+              blogs: this.state.blogs.filter(blogi => blogi.id !== id),
+              error: `removed ${blog.title} by ${blog.author}`
+            })
+            setTimeout(() => {
+              this.setState({
+                error: null
+              })
+            }, 5000)
+          })
+          .catch(error => {
+            this.setState({
+              error: "Cannot remove this blog"
+            });
+            setTimeout(() => {
+              this.setState({
+                error: null
+              });
+            }, 5000);
+          });
+      }
+    };
+  };
+
   render() {
     const loginForm = () => (
-      <div>
-        <h1>Log in to application</h1>
-        <form onSubmit={this.login}>
-          <div>
-            username:
-            <input
-              type="text"
-              name="username"
-              value={this.state.username}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <div>
-            password:
-            <input
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.handleLoginFieldChange}
-            />
-          </div>
-          <button type="submit">login</button>
-        </form>
-      </div>
+      <Togglable buttonLabel="login">
+        <LoginForm
+          visible={this.state.visible}
+          username={this.state.username}
+          password={this.state.password}
+          handleChange={this.handleLoginFieldChange}
+          handleSubmit={this.login}
+        />
+      </Togglable>
     );
 
     const noteForm = () => (
@@ -168,6 +209,31 @@ class App extends React.Component {
       </div>
     );
 
+    const LoginForm = ({ handleSubmit, handleChange, username, password }) => {
+      return (
+        <div>
+          <h2>Login</h2>
+
+          <form onSubmit={handleSubmit}>
+            <div>
+              username
+              <input value={username} onChange={handleChange} name="username" />
+            </div>
+            <div>
+              password
+              <input
+                type="password"
+                name="password"
+                value={password}
+                onChange={handleChange}
+              />
+            </div>
+            <button type="submit">login</button>
+          </form>
+        </div>
+      );
+    };
+
     return (
       <div>
         <h1> Blogilistat</h1>
@@ -185,9 +251,17 @@ class App extends React.Component {
           </div>
         )}
         <h2>blogs</h2>
-        {this.state.blogs.map(blog => (
-          <Blog key={blog.id} blog={blog} />
-        ))}
+        {this.state.blogs
+          .sort((one, two) => two.likes - one.likes)
+          .map(blog => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              like={this.handleLike(blog.id)}
+              handleDelete={this.handleDelete(blog.id)}
+              showButton={this.state.user === null ? false :this.state.user.username.toString() === blog.user.username.toString() ? true: false}
+            />
+          ))}
       </div>
     );
   }
