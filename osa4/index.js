@@ -19,11 +19,13 @@ mongoose.connect(
     console.log(err)
 })
 
+app.use(middleware.tokenExtractor)
 app.use(cors());
 app.use(bodyParser.json());
+
 app.use(express.static("build"));
 app.use(middleware.logger);
-app.use(middleware.tokenExtractor)
+
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)

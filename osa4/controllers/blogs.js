@@ -3,13 +3,6 @@ const Blog = require("../models/blog")
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
-// const getTokenFrom = (req) => {
-//   const authorization = req.get('authorization')
-//   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-//     return authorization.substring(7)
-//   }
-//   return null
-// }
 
 blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog
@@ -35,18 +28,21 @@ blogsRouter.get('/:id', async (req, res) => {
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
   try {
+    const token = req.token
     const decodedToken = jwt.verify(req.token, process.env.SECRET)
 
-    if (!decodedToken.id){
+    if (!token || !decodedToken.id){
       return res.status(401).json({error: 'token missing or invalid'})
     }
-    const user = await User.findById(decodedToken.id)
-    const blog = await Blog.findById(req.params.id)
-    if (blog.user.toString() === user._id.toString()){
-      user.blogs = user.blogs.filter(blogi => blogi!==blog._id)
-      await user.save()
-      await Blog.findByIdAndDelete(blog._id)
+
+    if (decodedToken.id.toString() !== blog.user.toString()) {
+      return response.status(400).json({ error: 'only creator can delete a blog' })
+    }
+
+    if (blog.user.toString() === decodedToken.id.toString()){
+      await blog.remove()
       res.status(204).end()
     } 
   } catch (exception) {
@@ -58,39 +54,37 @@ blogsRouter.delete('/:id', async (req, res) => {
     }
 })
 
-blogsRouter.post('/', async (req, res) => {
-  const body = req.body
-  try {
-    const decodedToken = jwt.verify(req.token, process.env.SECRET)
+blogsRouter.post('/', async (request, response) => {
+  const { title, author, url, likes } = request.body
 
-    if (!decodedToken.id){
-      return res.status(401).json({error: 'token missing or invalid'})
+  try {
+    const token = request.token
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
     }
-    if (body.title == undefined || body.url == undefined) {
-      return res.status(400).json({error: 'title or url missing'})
+
+    if (title === undefined ||  url === undefined) {
+      return response.status(400).json({ error: 'url or title missing'})
     }
 
     const user = await User.findById(decodedToken.id)
 
-    const blog = new Blog({
-      title: body.title, 
-      author: body.author === undefined? 'No author' : body.author, 
-      url: body.url, 
-      likes: body.likes === undefined ? 0 : body.likes,
-      user: user._id
-    })
-    const savedBlog = await blog.save()
+    const blog = new Blog({ title, author, url, likes: (likes || 0), user: user._id } )
 
-    user.blogs = user.blogs.concat(savedBlog._id)
+    const result = await blog.save()
+
+    user.blogs = user.blogs.concat(blog._id)
     await user.save()
 
-    res.json(Blog.format(blog))
+    response.status(201).json(result)
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
-      res.status(401).json({error:exception.message})
-    } else{
+      response.status(401).json({ error: exception.message })
+    } else {
       console.log(exception)
-      res.status(500).json({error: 'something went wrong...'})
+      response.status(500).json({ error: 'something went wrong...' })
     }
   }
 })
