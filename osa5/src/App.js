@@ -4,6 +4,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
+import PropTypes from 'prop-types'
 
 class App extends React.Component {
   constructor(props) {
@@ -176,7 +177,7 @@ class App extends React.Component {
       </Togglable>
     );
 
-    const noteForm = () => (
+    const blogForm = () => (
       <div>
         <h2>create new blog</h2>
         <form onSubmit={this.addBlog}>
@@ -234,6 +235,13 @@ class App extends React.Component {
       );
     };
 
+    LoginForm.propTypes = {
+      handleSubmit: PropTypes.func.isRequired,
+      handleChange: PropTypes.func.isRequired,
+      username: PropTypes.string.isRequired,
+      password: PropTypes.string.isRequired
+    }
+
     return (
       <div>
         <h1> Blogilistat</h1>
@@ -247,7 +255,7 @@ class App extends React.Component {
               <button onClick={this.logout}> logout</button>
             </p>
 
-            {noteForm()}
+            {blogForm()}
           </div>
         )}
         <h2>blogs</h2>
