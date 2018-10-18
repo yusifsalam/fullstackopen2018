@@ -4,7 +4,7 @@ import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
-import PropTypes from 'prop-types'
+import LoginForm from './components/LoginForm'
 
 class App extends React.Component {
   constructor(props) {
@@ -61,7 +61,8 @@ class App extends React.Component {
       window.localStorage.removeItem("loggedBlogAppUser");
       console.log("logged out");
       this.setState({
-        erorr: "logged out"
+        erorr: "logged out",
+        user: null
       });
       setTimeout(() => {
         this.setState({ erorr: null });
@@ -79,8 +80,9 @@ class App extends React.Component {
         title: this.state.newBlogTitle,
         author: this.state.newBlogAuthor,
         url: this.state.newBlogURL,
-        user: this.state.user._id
+        user: this.state.user
       };
+      console.log(blogObject)
       blogService.create(blogObject).then(newBlog => {
         this.setState({
           blogs: this.state.blogs.concat(newBlog),
@@ -111,7 +113,7 @@ class App extends React.Component {
     return () => {
       const blog = this.state.blogs.find(b => b.id === id);
       const changedBlog = { ...blog, likes: blog.likes + 1 };
-      console.log(changedBlog);
+      console.log('changed blog', changedBlog);
       blogService
         .update(id, changedBlog)
         .then(changedBlog => {
@@ -143,12 +145,12 @@ class App extends React.Component {
             this.setState({
               blogs: this.state.blogs.filter(blogi => blogi.id !== id),
               error: `removed ${blog.title} by ${blog.author}`
-            })
+            });
             setTimeout(() => {
               this.setState({
                 error: null
-              })
-            }, 5000)
+              });
+            }, 5000);
           })
           .catch(error => {
             this.setState({
@@ -164,7 +166,10 @@ class App extends React.Component {
     };
   };
 
+  
+
   render() {
+    // console.log(this.state.blogs)
     const loginForm = () => (
       <Togglable buttonLabel="login">
         <LoginForm
@@ -207,48 +212,35 @@ class App extends React.Component {
           </div>
           <button type="submit">create</button>
         </form>
+        <h2>blogs</h2>
+        {this.state.blogs
+          .sort((one, two) => two.likes - one.likes)
+          .map(blog => {
+            // console.log(blog)
+            return(
+            <Blog className='Blog'
+              key={blog.id}
+              blog={blog}
+              like={this.handleLike(blog.id)}
+              handleDelete={this.handleDelete(blog.id)}
+              showButton={
+                this.state.user === null ? false
+                  : blog.user.username === undefined ? 
+                  this.state.user.username.toString() === blog.user.toString() ?
+                    true : false : this.state.user.username.toString() === blog.user.username.toString() ? true
+                    : false
+              }
+            />
+          )})}
       </div>
     );
-
-    const LoginForm = ({ handleSubmit, handleChange, username, password }) => {
-      return (
-        <div>
-          <h2>Login</h2>
-
-          <form onSubmit={handleSubmit}>
-            <div>
-              username
-              <input value={username} onChange={handleChange} name="username" />
-            </div>
-            <div>
-              password
-              <input
-                type="password"
-                name="password"
-                value={password}
-                onChange={handleChange}
-              />
-            </div>
-            <button type="submit">login</button>
-          </form>
-        </div>
-      );
-    };
-
-    LoginForm.propTypes = {
-      handleSubmit: PropTypes.func.isRequired,
-      handleChange: PropTypes.func.isRequired,
-      username: PropTypes.string.isRequired,
-      password: PropTypes.string.isRequired
-    }
 
     return (
       <div>
         <h1> Blogilistat</h1>
         <Notification message={this.state.error} />
-        {this.state.user === null ? (
-          loginForm()
-        ) : (
+        {this.state.user === null ?
+          loginForm(): 
           <div>
             <p>
               {this.state.user.name} logged in
@@ -257,19 +249,7 @@ class App extends React.Component {
 
             {blogForm()}
           </div>
-        )}
-        <h2>blogs</h2>
-        {this.state.blogs
-          .sort((one, two) => two.likes - one.likes)
-          .map(blog => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              like={this.handleLike(blog.id)}
-              handleDelete={this.handleDelete(blog.id)}
-              showButton={this.state.user === null ? false :this.state.user.username.toString() === blog.user.username.toString() ? true: false}
-            />
-          ))}
+        }
       </div>
     );
   }
