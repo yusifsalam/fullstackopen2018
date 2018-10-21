@@ -2,6 +2,7 @@ import React from 'react'
 import { voteUp } from '../reducers/anecdoteReducer'
 import { showNotification } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
+import anecdoteService from '../services/anecdotes'
 
 class AnecdoteList extends React.Component {
   render() {
@@ -16,6 +17,7 @@ class AnecdoteList extends React.Component {
               <button
                 onClick={() => {
                   this.props.voteUp(anecdote.id)
+                  anecdoteService.voteUp(anecdote)
                   this.props.showNotification(
                     `you voted up '${anecdote.content}'`
                   )
