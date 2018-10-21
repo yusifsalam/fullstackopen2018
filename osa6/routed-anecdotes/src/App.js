@@ -6,15 +6,34 @@ import {
   Redirect
 } from "react-router-dom";
 
+const notiStyle = {
+  color: 'white',
+  fontStyle: 'italic',
+  fontSize: 28,
+  border: '2px solid Tomato'
+}
+
+const menuStyle = {
+  visited: 'white',
+  backgroundColor: 'DodgerBlue',
+  padding: '14px 25px',
+  textAlign: 'left',
+  textDecoration: 'overline',
+  textTransform: 'uppercase',
+  letterSpacing: '5px',
+}
+
+
 const Menu = ({ anecdotes, addNew, anecdoteById, notification }) => (
-  <div>
+  
+  <div >
     <Router>
       <div>
-        <div>
+        <div style={menuStyle}>
           <Link to="/"> anecdotes </Link>
           <Link to="/create"> create new </Link>
           <Link to="/about"> about </Link>
-          <p>{notification}</p>
+          <p style = {notiStyle}>{notification}</p>
         </div>
         <Route
           exact
