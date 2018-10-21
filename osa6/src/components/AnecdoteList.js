@@ -1,6 +1,6 @@
 import React from 'react'
 import { voteUp } from '../reducers/anecdoteReducer'
-import { showNotification } from '../reducers/notificationReducer'
+import { notify } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 import anecdoteService from '../services/anecdotes'
 
@@ -18,12 +18,10 @@ class AnecdoteList extends React.Component {
                 onClick={() => {
                   this.props.voteUp(anecdote.id)
                   anecdoteService.voteUp(anecdote)
-                  this.props.showNotification(
-                    `you voted up '${anecdote.content}'`
-                  )
-                  setTimeout(() => {
-                    this.props.showNotification(null)
-                  }, 3000)
+                  this.props.notify(`you voted up '${anecdote.content}'`, 3)
+                  // setTimeout(() => {
+                  //   this.props.showNotification(null)
+                  // }, 3000)
                 }}
               >
                 vote
@@ -51,5 +49,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { showNotification, voteUp }
+  { notify, voteUp }
 )(AnecdoteList)
