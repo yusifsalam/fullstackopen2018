@@ -6,73 +6,80 @@ import {
   Redirect
 } from "react-router-dom";
 
-const notiStyle = {
-  color: 'white',
-  fontStyle: 'italic',
-  fontSize: 28,
-  border: '2px solid Tomato'
-}
-
-const menuStyle = {
-  visited: 'white',
-  backgroundColor: 'DodgerBlue',
-  padding: '14px 25px',
-  textAlign: 'left',
-  textDecoration: 'overline',
-  textTransform: 'uppercase',
-  letterSpacing: '5px',
-}
-
+import { Table, Alert, Navbar, Nav, NavItem, Image, Grid, Col, Row } from "react-bootstrap";
 
 const Menu = ({ anecdotes, addNew, anecdoteById, notification }) => (
-  
-  <div >
-    <Router>
-      <div>
-        <div style={menuStyle}>
-          <Link to="/"> anecdotes </Link>
-          <Link to="/create"> create new </Link>
-          <Link to="/about"> about </Link>
-          <p style = {notiStyle}>{notification}</p>
-        </div>
-        <Route
-          exact
-          path="/"
-          render={() => <AnecdoteList anecdotes={anecdotes} />}
-        />
-        <Route
-          exact
-          path="/create"
-          render={() =>
-            notification === "" ? (
-              <CreateNew addNew={addNew} />
-            ) : (
-              <Redirect to="/" />
-            )
-          }
-        />
-        <Route exact path="/about" render={() => <About />} />
-        <Route
-          exact path="/anecdotes/:id"
-          render={({ match }) => (
-            <Anecdote anecdote={anecdoteById(match.params.id)} />
-          )}
-        />
-      </div>
-    </Router>
-  </div>
+  <Router>
+    <div>
+      <Navbar inverse collapseOnSelect>
+        <Navbar.Header>
+          <Navbar.Brand>Anecdote app</Navbar.Brand>
+          <Navbar.Toggle />
+        </Navbar.Header>
+        <Navbar.Collapse>
+          <Nav>
+            <NavItem href="#">
+              <Link to="/"> anecdotes </Link>
+            </NavItem>
+            <NavItem>
+              <Link to="/create"> create new </Link>
+            </NavItem>
+            <NavItem>
+              <Link to="/about"> about </Link>
+            </NavItem>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+      <Alert bsStyle='warning'>{notification}</Alert>
+      <Route
+        exact
+        path="/"
+        render={() => <AnecdoteList anecdotes={anecdotes} />}
+      />
+      <Route
+        exact
+        path="/create"
+        render={() =>
+          notification === "" ? (
+            <CreateNew addNew={addNew} />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route exact path="/about" render={() => <About />} />
+      <Route
+        exact
+        path="/anecdotes/:id"
+        render={({ match }) => (
+          <Anecdote anecdote={anecdoteById(match.params.id)} />
+        )}
+      />
+    </div>
+  </Router>
 );
 
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
-    <ul>
+    <Table striped>
+      <tbody>
+        {anecdotes.map(anecdote => (
+          <tr key={anecdote.id}>
+            <td>
+              <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+    {/* <ul>
       {anecdotes.map(anecdote => (
         <li key={anecdote.id}>
           <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
         </li>
       ))}
-    </ul>
+    </ul> */}
   </div>
 );
 
@@ -91,7 +98,9 @@ const Anecdote = ({ anecdote }) => {
 };
 
 const About = () => (
-  <div>
+  <Grid>
+    <Row>
+      <Col xs={6} md={6}>
     <h2>About anecdote app</h2>
     <p>According to Wikipedia:</p>
 
@@ -109,7 +118,12 @@ const About = () => (
       Software engineering is full of excellent anecdotes, at this app you can
       find the best and add more.
     </p>
-  </div>
+      </Col>
+    <Col xs={6} md={4}>
+    <Image src='/turing.jpg' responsive/>
+    </Col>
+    </Row>
+  </Grid>
 );
 
 const Footer = () => (
