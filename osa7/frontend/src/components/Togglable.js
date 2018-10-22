@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Button } from 'react-bootstrap'
 
 class Togglable extends React.Component {
   constructor(props) {
@@ -14,17 +15,17 @@ class Togglable extends React.Component {
   }
 
   render() {
-    const hideWhenVisible = { display: this.state.visible ? 'none' : '' }
-    const showWhenVisible = { display: this.state.visible ? '' : 'none' }
+    const hideWhenVisible = { display: this.state.visible ? 'none' : '', maxWidth:200 }
+    const showWhenVisible = { display: this.state.visible ? '' : 'none', maxWidth:200  }
 
     return (
       <div>
         <div style={hideWhenVisible}>
-          <button onClick={this.toggleVisibility}>{this.props.buttonLabel}</button>
+          <Button bsStyle='primary' block onClick={this.toggleVisibility}>{this.props.buttonLabel}</Button>
         </div>
         <div style={showWhenVisible}>
           {this.props.children}
-          <button onClick={this.toggleVisibility}>cancel</button>
+          <Button bsStyle='warning' block onClick={this.toggleVisibility}>cancel</Button>
         </div>
       </div>
     )

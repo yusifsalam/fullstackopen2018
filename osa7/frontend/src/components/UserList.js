@@ -3,12 +3,11 @@ import { Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 const UserList = ({ users }) => {
-    console.log(users)
     if (users === null) return null
     return(
     <div>
       <h2>users</h2>
-      <Table striped bordered hover variant="dark">
+      <Table striped bordered hover>
         <thead>
             <tr>
                 <th>user</th>

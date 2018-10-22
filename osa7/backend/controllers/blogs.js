@@ -71,12 +71,12 @@ blogsRouter.post('/', async (request, response) => {
 
     const user = await User.findById(decodedToken.id)
 
-    const blog = new Blog({ title, author, url, likes: (likes || 0), user: user } )
+    const blog = new Blog({ title, author, url, likes: (likes || 0), user: user, comments:[]} )
     
 
     const result = await blog.save()
     
-    user.blogs = user.blogs.concat(blog._id)
+    user.blogs = user.blogs.concat(Blog.format(blog).id)
     await user.save()
 
     response.status(201).json(Blog.format(result))
@@ -97,7 +97,8 @@ blogsRouter.put('/:id', (req, res) => {
     title: body.title, 
     url: body.url, 
     author: body.author, 
-    likes: body.likes
+    likes: body.likes,
+    comments: body.comments
   }
 
   Blog.

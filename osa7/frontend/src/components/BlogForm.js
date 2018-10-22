@@ -1,35 +1,34 @@
 import React from "react";
-// import Blog from './Blog'
+import { Button, FormControl, FormGroup } from 'react-bootstrap'
 
 const BlogForm = ({ onSubmit, handleChange, title, author, url, user }) => (
   <div>
     <h2>create new blog</h2>
     <form onSubmit={onSubmit}>
-      <div>
-        title
-        <input
-          value={title}
-          name="newBlogTitle"
-          onChange={handleChange}
+      <FormGroup>
+        <FormControl 
+        type='text'
+        name='newBlogTitle'
+        value={title}
+        placeholder='Blog title'
+        onChange={handleChange}
         />
-      </div>
-      <div>
-        author
-        <input
-          value={author}
-          name="newBlogAuthor"
-          onChange={handleChange}
+        <FormControl 
+        type='text'
+        name='newBlogAuthor'
+        value={author}
+        placeholder='Author name'
+        onChange={handleChange}
         />
-      </div>
-      <div>
-        url
-        <input
-          value={url}
-          name="newBlogURL"
-          onChange={handleChange}
+        <FormControl 
+        type='text'
+        value={url}
+        name='newBlogURL'
+        placeholder='Blog URL'
+        onChange={handleChange}
         />
-      </div>
-      <button type="submit">create</button>
+      </FormGroup>
+      <Button block type="submit">create</Button>
     </form>
   </div>
 )

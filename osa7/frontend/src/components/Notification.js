@@ -1,12 +1,13 @@
 import React from 'react'
+import { Alert } from 'react-bootstrap'
 
 const Notification = ({message}) => {
     if (message === null) {
         return null
     }
     return (
-        <div className='error'>
-            {message}
+        <div>
+        <Alert bsStyle='success'>{message}</Alert>
         </div>
     )
 }

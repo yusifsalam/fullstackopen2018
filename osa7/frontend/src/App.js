@@ -10,12 +10,13 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
-import { Table } from "react-bootstrap";
+import { Button, Label } from 'react-bootstrap'
+
 import {
   BrowserRouter as Router,
   Route,
-  Link,
-  Redirect
+  NavLink,
+// Redirect
 } from "react-router-dom";
 
 class App extends React.Component {
@@ -23,7 +24,7 @@ class App extends React.Component {
     super(props);
     this.state = {
       blogs: [],
-      error: null,
+      notification: null,
       username: "",
       password: "",
       newBlogTitle: "",
@@ -31,7 +32,8 @@ class App extends React.Component {
       newBlogURL: "",
       newBlogLikes: 0,
       user: null,
-      users: []
+      users: [],
+      comment:''
     };
   }
 
@@ -61,10 +63,10 @@ class App extends React.Component {
       this.setState({ username: "", password: "", user });
     } catch (exception) {
       this.setState({
-        error: "username or password incorrect"
+        notification: "username or password incorrect"
       });
       setTimeout(() => {
-        this.setState({ error: null });
+        this.setState({ notification: null });
       }, 5000);
     }
   };
@@ -75,11 +77,11 @@ class App extends React.Component {
       window.localStorage.removeItem("loggedBlogAppUser");
       console.log("logged out");
       this.setState({
-        erorr: "logged out",
+        notification: "logged out",
         user: null
       });
       setTimeout(() => {
-        this.setState({ erorr: null });
+        this.setState({ notification: null });
       }, 3000);
     } catch (exception) {
       console.log(exception);
@@ -104,10 +106,10 @@ class App extends React.Component {
           newBlogTitle: "",
           newBlogURL: "",
           newBlogLikes: 0,
-          error: `a new blog ${blogObject.title} by ${blogObject.author} added`
+          notification: `a new blog ${blogObject.title} by ${blogObject.author} added`
         });
         setTimeout(() => {
-          this.setState({ error: null });
+          this.setState({ notification: null });
         }, 3000);
       });
     } catch (exception) {
@@ -123,6 +125,42 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  handleComment = (event) => {
+    event.preventDefault()
+    try{
+      const id = event.target.querySelector('input').id
+      const blog = this.state.blogs.find(b => b.id === id)
+      const changedBlog = { ...blog, comments: blog.comments.concat(this.state.comment) };
+      blogService
+        .update(id, changedBlog)
+        .then(changedBlog => {
+          this.setState({
+            blogs: this.state.blogs.map(
+              blog => (blog.id !== id ? blog : changedBlog)
+            ),
+            comment: '',
+            notification:`comment ${this.state.comment} added to blog ${changedBlog.title}!`
+          });
+          setTimeout(() => {
+            this.setState({
+              notification: null
+            });
+          }, 5000);
+        })
+        .catch(err => {
+          this.setState({
+            notification: `blog ${blog.title} has already been removed`,
+            blogs: this.state.blogs.filter(b => b.id !== id)
+          });
+          setTimeout(() => {
+            this.setState({ notification: null });
+          }, 5000);
+        });
+    } catch (exception) {
+      console.log(exception)
+    }
+  }
+
   handleLike = id => {
     return () => {
       const blog = this.state.blogs.find(b => b.id === id);
@@ -137,13 +175,13 @@ class App extends React.Component {
             )
           });
         })
-        .catch(error => {
+        .catch(err => {
           this.setState({
-            error: `blog ${blog.title} has already been removed`,
+            notification: `blog ${blog.title} has already been removed`,
             blogs: this.state.blogs.filter(b => b.id !== id)
           });
           setTimeout(() => {
-            this.setState({ error: null });
+            this.setState({ notification: null });
           }, 5000);
         });
     };
@@ -158,21 +196,21 @@ class App extends React.Component {
           .then(b => {
             this.setState({
               blogs: this.state.blogs.filter(blogi => blogi.id !== id),
-              error: `removed ${blog.title} by ${blog.author}`
+              notification: `removed ${blog.title} by ${blog.author}`
             });
             setTimeout(() => {
               this.setState({
-                error: null
+                notification: null
               });
             }, 5000);
           })
-          .catch(error => {
+          .catch(err => {
             this.setState({
-              error: "Cannot remove this blog"
+              notification: "Cannot remove this blog"
             });
             setTimeout(() => {
               this.setState({
-                error: null
+                notification: null
               });
             }, 5000);
           });
@@ -180,46 +218,60 @@ class App extends React.Component {
     };
   };
 
-  userById = id =>
-    this.state.users.find(u => u.id === id);
+  userById = id => this.state.users.find(u => u.id === id);
 
   render() {
+    const Menu = () => {
+      return(
+        <div>
+          <NavLink exact to='/'> blogs </NavLink>
+          <NavLink exact to='/users'> users </NavLink>
+        </div>
+      )
+    }
+
     return (
-        <Router>
-      <div>
-        <h1> Blogilistat</h1>
-        <Notification message={this.state.error} />
-        {this.state.user === null ? (
-          <Togglable buttonLabel="login">
-            <LoginForm
-              visible={this.state.visible}
-              username={this.state.username}
-              password={this.state.password}
-              handleChange={this.handleLoginFieldChange}
-              handleSubmit={this.login}
-            />
-          </Togglable>
-        ) : (
-          <div>
-            <p>
-              {this.state.user.name} logged in
-              <button onClick={this.logout}> logout</button>
-            </p>
+      <Router>
+        <div>
+          <h1> Blogilistat</h1>
+          <Notification message={this.state.notification} />
+          {this.state.user === null ? (
+            <Togglable buttonLabel="login">
+              <LoginForm
+                visible={this.state.visible}
+                username={this.state.username}
+                password={this.state.password}
+                handleChange={this.handleLoginFieldChange}
+                handleSubmit={this.login}
+              />
+            </Togglable>
+          ) : (
             <div>
-              <Togglable buttonLabel="create blog">
-                <BlogForm
-                  onSubmit={this.addBlog}
-                  handleChange={this.handleBlogFieldChange}
-                  title={this.newBlogTitle}
-                  author={this.newBlogAuthor}
-                  url={this.newBlogURL}
-                  user={this.state.user}
-                />
-              </Togglable>
+              <Menu />
+              <Label>
+                {this.state.user.name} logged in
+                <Button bsStyle='info' bsSize='small' onClick={this.logout}> logout</Button>
+              </Label>
+              <div>
+                <Togglable buttonLabel="create blog">
+                  <BlogForm
+                    onSubmit={this.addBlog}
+                    handleChange={this.handleBlogFieldChange}
+                    title={this.newBlogTitle}
+                    author={this.newBlogAuthor}
+                    url={this.newBlogURL}
+                    user={this.state.user}
+                  />
+                </Togglable>
                 <div>
                   <Route
                     exact
                     path="/"
+                    render={() => <BlogList blogs={this.state.blogs} />}
+                  />
+                  <Route
+                    exact
+                    path="/blogs"
                     render={() => <BlogList blogs={this.state.blogs} />}
                   />
                   <Route
@@ -243,16 +295,19 @@ class App extends React.Component {
                           blog={this.state.blogs.find(
                             b => b.id === match.params.id
                           )}
+                          handleChange={this.handleBlogFieldChange}
+                          comment = {this.state.comment}
+                          handleComment={this.handleComment}
                         />
                       );
                     }}
                   />
                 </div>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-        </Router>
+          )}
+        </div>
+      </Router>
     );
   }
 }
