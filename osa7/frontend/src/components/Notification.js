@@ -1,15 +1,15 @@
 import React from 'react'
 import { Alert } from 'react-bootstrap'
 
-const Notification = ({message}) => {
-    if (message === null) {
-        return null
-    }
-    return (
-        <div>
-        <Alert bsStyle='success'>{message}</Alert>
-        </div>
-    )
+const Notification = ({ message }) => {
+	if (message === null) {
+		return null
+	}
+	return (
+		<div>
+			<Alert bsStyle="success">{message}</Alert>
+		</div>
+	)
 }
 
 export default Notification
