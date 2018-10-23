@@ -13,10 +13,9 @@ import BlogForm from "./components/BlogForm";
 import { Button, Label } from 'react-bootstrap'
 
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Route,
-  NavLink,
-// Redirect
+  NavLink
 } from "react-router-dom";
 
 class App extends React.Component {
@@ -125,13 +124,13 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  handleComment = (event) => async() => {
+  handleComment = (event) => {
     event.preventDefault()
     try{
       const id = event.target.querySelector('input').id
       const blog = this.state.blogs.find(b => b.id === id)
       const changedBlog = { ...blog, comments: blog.comments.concat(this.state.comment) };
-      await blogService
+      blogService
         .update(id, changedBlog)
         .then(changedBlog => {
           this.setState({
@@ -232,7 +231,7 @@ class App extends React.Component {
     }
 
     return (
-      <Router>
+      <Router >
         <div>
           <h1> Blogilistat</h1>
           <Notification message={this.state.notification} />
