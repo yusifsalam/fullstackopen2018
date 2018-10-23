@@ -48,9 +48,10 @@ blogsRouter.delete('/:id', async (req, res) => {
   } catch (exception) {
     if (exception.name === 'JsonWebTokenError') {
       res.status(401).json({error:exception.message})
-    } else {}
+    } else {
       console.log(exception)
-      res.status(400).send({error: 'malformatted id'})
+      res.status(400).json({error: 'malformatted id'})
+    }
     }
 })
 
@@ -109,7 +110,7 @@ blogsRouter.put('/:id', async (req, res) => {
       })
       .catch(err => {
         console.log(err)
-        res.status(400).send({error: 'malformatted id'})
+        res.status(400).json({error: 'malformatted id'})
       })
 })
 

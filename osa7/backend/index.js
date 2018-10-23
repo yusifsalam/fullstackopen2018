@@ -24,12 +24,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use(express.static("build"));
-app.use(middleware.logger);
+// app.use(middleware.logger);
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', userRouter)
 app.use('/api/login', loginRouter)
-app.use(middleware.error);
+// app.use(middleware.error);
 
 const server = http.createServer(app)
 

@@ -22,14 +22,14 @@ class Blog extends React.Component {
 		if (user === undefined) return null
 		const deletable = blog.user.username === user.username
 		return (
-			<div>
+			<div className="content">
 				<h2>
 					{blog.title} by {blog.author}
 				</h2>
 				<a href={blog.url}>{blog.url}</a>
-				<p>
+				<p className="likeCount">
 					{blog.likes} likes{' '}
-					<Button onClick={handleLike} bsStyle="success">
+					<Button className="likeBtn" onClick={handleLike} bsStyle="success">
 						like
 					</Button>
 				</p>
@@ -40,9 +40,9 @@ class Blog extends React.Component {
 					</Button>
 				)}
 				<h3>comments</h3>
-				<ListGroup>
+				<ListGroup >
 					{blog.comments.map(comment => (
-						<ListGroupItem key={comment}>{comment}</ListGroupItem>
+						<ListGroupItem className="comments" key={comment}>{comment}</ListGroupItem>
 					))}
 				</ListGroup>
 

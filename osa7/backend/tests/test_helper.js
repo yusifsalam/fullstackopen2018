@@ -34,6 +34,15 @@ const initialBlogs = [
     }
 ]
 
+const initialUsers = [
+    {
+        _id: '5bc5d7e2e21026957707bbdc',
+        name: "Name",
+        username: 'username',
+        token: '134'
+    }
+]
+
 const usersInDb = async () => {
     const users = await User.find({})
     return users
@@ -53,5 +62,5 @@ const blogsInDb = async () => {
 }
 
 module.exports = {
-    initialBlogs, nonExistingId, blogsInDb, usersInDb
+    initialBlogs, initialUsers, nonExistingId, blogsInDb, usersInDb
 }
