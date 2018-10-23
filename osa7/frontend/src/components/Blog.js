@@ -3,8 +3,10 @@ import { Button, ListGroup, ListGroupItem, FormGroup, FormControl } from 'react-
 
 class Blog extends React.Component {
   render() {
-    const { blog, handleChange, comment, handleComment } = this.props;
+    const { blog, handleChange, comment, handleComment, handleDelete, handleLike, user } = this.props;
     if (blog === undefined) return null
+    if (user === undefined) return null
+    const deletable = blog.user.username === user.username
     return (
       <div>
         <h2>
@@ -12,10 +14,10 @@ class Blog extends React.Component {
         </h2>
         <a href={blog.url}>{blog.url}</a>
         <p>
-          {blog.likes} likes <Button>like</Button>
+          {blog.likes} likes <Button onClick={handleLike} bsStyle='success'>like</Button>
         </p>
-        <p>added by {blog.user.name}</p>
-        <Button>delete</Button>
+        <p>added by {blog.user ? blog.user.name : 'anonymous'}</p>
+        {deletable && <Button onClick={handleDelete} bsStyle='danger'>delete</Button>}
         <h3>comments</h3>
         <ListGroup>
         {blog.comments.map(comment=>

@@ -125,13 +125,13 @@ class App extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  handleComment = (event) => {
+  handleComment = (event) => async() => {
     event.preventDefault()
     try{
       const id = event.target.querySelector('input').id
       const blog = this.state.blogs.find(b => b.id === id)
       const changedBlog = { ...blog, comments: blog.comments.concat(this.state.comment) };
-      blogService
+      await blogService
         .update(id, changedBlog)
         .then(changedBlog => {
           this.setState({
@@ -161,19 +161,21 @@ class App extends React.Component {
     }
   }
 
-  handleLike = id => {
-    return () => {
+  handleLike = (id) => async() => {
       const blog = this.state.blogs.find(b => b.id === id);
       const changedBlog = { ...blog, likes: blog.likes + 1 };
-      console.log("changed blog", changedBlog);
-      blogService
+      await blogService
         .update(id, changedBlog)
         .then(changedBlog => {
           this.setState({
             blogs: this.state.blogs.map(
               blog => (blog.id !== id ? blog : changedBlog)
-            )
-          });
+            ),
+            notification: `you liked ${blog.title} by ${blog.author}`
+          })
+          setTimeout(() => {
+            this.setState({ notification: null });
+          }, 5000);
         })
         .catch(err => {
           this.setState({
@@ -184,7 +186,6 @@ class App extends React.Component {
             this.setState({ notification: null });
           }, 5000);
         });
-    };
   };
 
   handleDelete = id => {
@@ -290,14 +291,16 @@ class App extends React.Component {
                     exact
                     path="/blogs/:id"
                     render={({ match }) => {
+                      const thisBlog = this.state.blogs.find(b=>b.id===match.params.id)
                       return (
                         <Blog
-                          blog={this.state.blogs.find(
-                            b => b.id === match.params.id
-                          )}
+                          blog={thisBlog}
                           handleChange={this.handleBlogFieldChange}
                           comment = {this.state.comment}
                           handleComment={this.handleComment}
+                          user = {this.state.user}
+                          handleDelete={this.handleDelete(match.params.id)}
+                          handleLike={this.handleLike(match.params.id)}
                         />
                       );
                     }}
