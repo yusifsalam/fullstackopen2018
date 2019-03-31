@@ -79,10 +79,10 @@ const resolvers = {
     bookCount: () => Book.collection.countDocuments(),
     authorCount: () => Author.collection.countDocuments(),
     allBooks: (root, args) => {
-      if (!args.author && !args.genre) return Book.find({})
-      if (!args.genre && args.author) return Book.find({}) // to be done later
-      if (!args.author && args.genre) return Book.find({genres: {$in: args.genre}})
-      return Books.find({}) // to be completed later
+      if (!args.author && !args.genre) return Book.find({}).populate('author')
+      if (!args.genre && args.author) return Book.find({author: args.author}) // to be done later
+      if (!args.author && args.genre) return Book.find({genres: {$in: args.genre}}).populate('author')
+      // else return Book.find({}) // to be completed later
     },
     allAuthors: () => Author.find({}),
     me: (root, args, context) => {
