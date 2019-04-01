@@ -5,7 +5,7 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Recommend from './components/Recommend'
 import { gql } from 'apollo-boost'
-// import { Query, ApolloConsumer, Mutation} from 'react-apollo'
+import { Subscription } from 'react-apollo'
 import { useQuery, useMutation, useApolloClient } from 'react-apollo-hooks'
 
 const CURRENT_USER = gql`{
@@ -67,6 +67,25 @@ const LOGIN = gql`
   }
 `
 
+const BOOK_DETAILS = gql`
+fragment BookDetails on Book {
+  title
+  author {
+    name
+  }
+  published
+  genres
+}`
+
+const BOOK_ADDED = gql`
+subscription {
+  bookAdded {
+    ...BookDetails
+  }
+}
+${BOOK_DETAILS}
+`
+
 
 
 const App = () => {
@@ -88,7 +107,19 @@ const App = () => {
 
   const addBook = useMutation(CREATE_BOOK, {
     onError: handleError,
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
+    // refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
+    update: (store, response) => {
+      const dataInStore = store.readQuery({query: ALL_BOOKS})
+      const addedBook = response.data.addBook
+
+      if (!includedIn(dataInStore.allBooks, addedBook)) {
+        dataInStore.allBooks.push(addedBook)
+        client.writeQuery({
+          query: ALL_BOOKS,
+          data: dataInStore
+        })
+      }
+    }
   })
 
   const editBorn = useMutation(EDIT_BIRTHYEAR, {
@@ -109,6 +140,17 @@ const App = () => {
     client.resetStore()
   }
 
+  const notify = (message) => {
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 2000)
+  }
+
+  const includedIn = (set, object) => 
+    set.map(p => p.id).includes(object.id)  
+
+
   if (!token) {
     return (
       <div>
@@ -126,6 +168,27 @@ const App = () => {
   return (
     <div>
       {errorNotification()}
+      <Subscription
+        subscription={BOOK_ADDED}
+        onSubscriptionData={({subscriptionData}) => {
+          const addedBook = subscriptionData.data.bookAdded
+          // näytetään muualla tehty lisäys myös notifikaationa
+          notify(`${addedBook.title} added`)
+
+          const dataInStore = client.readQuery({ query: ALL_BOOKS })
+          if (!includedIn(dataInStore.allBooks, addedBook)) {
+            dataInStore.allBooks.push(addedBook)
+            client.writeQuery({
+              query: ALL_BOOKS,
+              data: dataInStore
+            })
+          }
+        }}
+      > 
+        {() => null}
+      </Subscription>
+    {/* </div> */}
+
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>

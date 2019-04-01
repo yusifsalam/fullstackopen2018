@@ -1,4 +1,4 @@
-const { ApolloServer, UserInputError, AuthenticationError, gql } = require('apollo-server')
+const { ApolloServer, UserInputError, AuthenticationError, gql, PubSub } = require('apollo-server')
 const uuid = require('uuid/v1')
 require('dotenv').config()
 const mongoose = require('mongoose')
@@ -6,6 +6,8 @@ const Author = require('./models/author')
 const Book = require('./models/book')
 const User = require('./models/user')
 const jwt = require('jsonwebtoken')
+
+const pubsub = new PubSub()
 
 mongoose.set('useFindAndModify', false)
 
@@ -72,6 +74,10 @@ const typeDefs = gql`
         password: String!
       ): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `
 
 const resolvers = {
@@ -118,6 +124,8 @@ const resolvers = {
       author = await Author.findOne({name: args.author})
       const book = new Book({...args, author: author})
       await book.save()
+
+      pubsub.publish('BOOK ADDED', {bookAdded: book})
       return book
     },
     editAuthor: async (root, args, { currentUser }) => {
@@ -156,6 +164,12 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, process.env.SECRET) }
     }
+  },
+
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK ADDED'])
+    }
   }
 }
 
@@ -174,6 +188,7 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
