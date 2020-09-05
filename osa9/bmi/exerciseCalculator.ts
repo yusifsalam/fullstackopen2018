@@ -40,10 +40,9 @@ interface ParsedArgs {
 
 const parseArgs = (args: Array<string>): ParsedArgs => {
     if (args.length < 4) throw new Error('Not enough arguments!')
-    const arguments = args.slice(2)
-    const target = Number(arguments[0])
-    const arr = new Array<number>()
-    const arrNumbers = arguments.slice(1).map((n) => Number(n))
+    const argus = args.slice(2)
+    const target = Number(argus[0])
+    const arrNumbers = argus.slice(1).map((n) => Number(n))
     const arrValid = arrNumbers.filter((n) => isNaN(n)).length === 0
     if (!isNaN(target) && arrValid) {
         return {
