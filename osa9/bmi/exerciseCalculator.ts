@@ -8,7 +8,10 @@ interface Result {
     average: number;
 }
 
-const calculateExercise = (target: number, days: Array<number>): Result => {
+export const calculateExercise = (
+    target: number,
+    days: Array<number>
+): Result => {
     const daysCount = days.length;
     const trainingDays = daysCount - days.filter((day) => day === 0).length;
     const average = days.reduce((a, b) => a + b) / daysCount;
@@ -16,12 +19,12 @@ const calculateExercise = (target: number, days: Array<number>): Result => {
     const rating = ratio <= 1 ? 1 : ratio <= 1.1 ? 2 : 3;
     const ratingDescription =
         rating === 1
-            ? 'try trying'
+            ? "try trying"
             : rating === 2
-            ? 'not bad but could be better'
+            ? "not bad but could be better"
             : rating === 3
-            ? 'well done'
-            : 'something went wrong, huh';
+            ? "well done"
+            : "something went wrong, huh";
     return {
         periodLength: daysCount,
         trainingDays: trainingDays,
@@ -39,7 +42,7 @@ interface ParsedArgs {
 }
 
 const parseArgs = (args: Array<string>): ParsedArgs => {
-    if (args.length < 4) throw new Error('Not enough arguments!');
+    if (args.length < 4) throw new Error("Not enough arguments!");
     const argus = args.slice(2);
     const target = Number(argus[0]);
     const arrNumbers = argus.slice(1).map((n) => Number(n));
@@ -50,14 +53,17 @@ const parseArgs = (args: Array<string>): ParsedArgs => {
             arr: arrNumbers,
         };
     } else {
-        throw new Error('Provided values are not numbers');
+        throw new Error("Provided values are not numbers");
     }
 };
 
-try {
-    const { target, arr } = parseArgs(process.argv);
-    console.log(calculateExercise(target, arr));
-} catch (e) {
-    if (e instanceof Error)
-        console.log('Something went wrong, message: ', e.message);
+const runningAsScript = !module.parent;
+if (runningAsScript) {
+    try {
+        const { target, arr } = parseArgs(process.argv);
+        console.log(calculateExercise(target, arr));
+    } catch (e) {
+        if (e instanceof Error)
+            console.log("Something went wrong, message: ", e.message);
+    }
 }
