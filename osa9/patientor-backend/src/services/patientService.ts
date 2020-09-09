@@ -16,13 +16,16 @@ const findById = (id: string): PatientEntry | undefined => {
 };
 
 const getNonSensitiveEntries = (): NonSensitivePatientEntry[] => {
-    return patientData.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-        id,
-        name,
-        dateOfBirth,
-        gender,
-        occupation,
-    }));
+    return patientData.map(
+        ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+            id,
+            name,
+            dateOfBirth,
+            gender,
+            occupation,
+            entries,
+        })
+    );
 };
 
 const addEntry = (entry: NewPatientEntry): PatientEntry => {
