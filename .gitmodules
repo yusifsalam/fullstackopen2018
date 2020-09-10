@@ -1,0 +1,3 @@
+[submodule "osa9/patientor"]
+	path = osa9/patientor
+	url = git@github.com:yusifsalam/patientor.git
