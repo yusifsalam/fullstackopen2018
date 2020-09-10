@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { NewPatientEntry, Gender } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
