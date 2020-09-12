@@ -233,7 +233,11 @@ const isHealthCheckRating = (
 };
 
 const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
-    if (!healthCheckRating || !isHealthCheckRating(healthCheckRating)) {
+    if (
+        healthCheckRating === null ||
+        healthCheckRating === undefined ||
+        !isHealthCheckRating(healthCheckRating)
+    ) {
         throw new Error(
             `Incorrect or missing healthcheck rating: ${
                 healthCheckRating as string
