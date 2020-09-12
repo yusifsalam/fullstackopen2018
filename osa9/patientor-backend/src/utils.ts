@@ -10,6 +10,7 @@ import {
     NewOccupationalEntry,
     HealthCheckRating,
     NewEntry,
+    DiagnoseEntry,
 } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -36,6 +37,7 @@ const toNewHospitalEntry = (object: any): NewHospitalEntry => {
         type: parseHospitalType(object.type),
         specialist: parseSpecialist(object.specialist),
         discharge: parseDischarge(object.discharge),
+        diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
     };
 
     return newEntry;
@@ -48,6 +50,7 @@ const toNewHealthCheckEntry = (object: any): NewHealthCheckEntry => {
         type: parseHealthCheckType(object.type),
         specialist: parseSpecialist(object.specialist),
         healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
+        diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
     };
 
     return newEntry;
@@ -60,6 +63,7 @@ const toNewOccupationalEntry = (object: any): NewOccupationalEntry => {
         type: parseOccupationalType(object.type),
         specialist: parseSpecialist(object.specialist),
         employerName: parseEmployerName(object.employerName),
+        diagnosisCodes: parseDiagnosisCodes(object.diagnosisCodes),
     };
 
     return newEntry;
@@ -238,6 +242,19 @@ const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
     }
 
     return healthCheckRating;
+};
+
+const parseDiagnosisCodes = (codes: [any]): Array<DiagnoseEntry["code"]> => {
+    if (!codes) return [];
+    else {
+        const invalidCodes = codes.filter((c) => !isString(c));
+        if (invalidCodes.length !== 0) {
+            throw new Error(
+                `Incorrect or missing entries: ${codes.toString()}`
+            );
+        }
+    }
+    return codes;
 };
 
 export default { toNewPatientEntry, toNewEntry };
