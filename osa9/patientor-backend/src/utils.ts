@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { NewPatientEntry, Gender } from "./types";
+import { NewPatientEntry, Gender, EntryType, Entry } from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -10,7 +10,7 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
         ssn: parseSsn(object.ssn),
         gender: parseGender(object.gender),
         occupation: parseOccupation(object.occupation),
-        entries: [],
+        entries: parseEntries(object.entries),
     };
 
     return newEntry;
@@ -26,6 +26,10 @@ const isDate = (date: string): boolean => {
 
 const isGender = (param: any): param is Gender => {
     return Object.values(Gender).includes(param);
+};
+
+const isEntryType = (param: any): param is EntryType => {
+    return Object.values(EntryType).includes(param);
 };
 
 const parseName = (name: any): string => {
@@ -64,6 +68,23 @@ const parseOccupation = (occupation: any): string => {
         );
     }
     return occupation;
+};
+
+const parseEntries = (entries: [any]): Entry[] => {
+    if (!entries)
+        throw new Error(
+            `Incorrect or missing entries haha: ${entries as string}`
+        );
+    else {
+        const invalidEntries = entries.filter((e) => !isEntryType(e.type));
+        if (invalidEntries.length !== 0) {
+            throw new Error(
+                `Incorrect or missing entries: ${entries.toString()}`
+            );
+        }
+    }
+
+    return entries;
 };
 
 export default toNewPatientEntry;
