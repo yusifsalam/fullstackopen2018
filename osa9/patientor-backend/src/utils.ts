@@ -1,5 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { NewPatientEntry, Gender, EntryType, Entry } from "./types";
+import {
+    NewPatientEntry,
+    Gender,
+    EntryType,
+    Entry,
+    NewHospitalEntry,
+    Discharge,
+    NewHealthCheckEntry,
+    NewOccupationalEntry,
+    HealthCheckRating,
+    NewEntry,
+} from "./types";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -14,6 +25,58 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
     };
 
     return newEntry;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const toNewHospitalEntry = (object: any): NewHospitalEntry => {
+    const newEntry: NewHospitalEntry = {
+        description: parseDescription(object.description),
+        date: parseDate(object.date),
+        type: parseHospitalType(object.type),
+        specialist: parseSpecialist(object.specialist),
+        discharge: parseDischarge(object.discharge),
+    };
+
+    return newEntry;
+};
+
+const toNewHealthCheckEntry = (object: any): NewHealthCheckEntry => {
+    const newEntry: NewHealthCheckEntry = {
+        description: parseDescription(object.description),
+        date: parseDate(object.date),
+        type: parseHealthCheckType(object.type),
+        specialist: parseSpecialist(object.specialist),
+        healthCheckRating: parseHealthCheckRating(object.healthCheckRating),
+    };
+
+    return newEntry;
+};
+
+const toNewOccupationalEntry = (object: any): NewOccupationalEntry => {
+    const newEntry: NewOccupationalEntry = {
+        description: parseDescription(object.description),
+        date: parseDate(object.date),
+        type: parseOccupationalType(object.type),
+        specialist: parseSpecialist(object.specialist),
+        employerName: parseEmployerName(object.employerName),
+    };
+
+    return newEntry;
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+const toNewEntry = (object: any): NewEntry | undefined => {
+    switch (object.type) {
+        case EntryType.Hospital:
+            return toNewHospitalEntry(object);
+        case EntryType.HealthCheck:
+            return toNewHealthCheckEntry(object);
+        case EntryType.OccupationalHealthcare:
+            return toNewOccupationalEntry(object);
+        default:
+            return undefined;
+    }
 };
 
 const isString = (text: any): text is string => {
@@ -87,4 +150,94 @@ const parseEntries = (entries: [any]): Entry[] => {
     return entries;
 };
 
-export default toNewPatientEntry;
+const parseDescription = (description: any): string => {
+    if (!description || !isString(description)) {
+        throw new Error(
+            `Incorrect or missing description: ${description as string}`
+        );
+    }
+    return description;
+};
+
+const parseSpecialist = (specialist: any): string => {
+    if (!specialist || !isString(specialist)) {
+        throw new Error(
+            `Incorrect or missing specialist: ${specialist as string}`
+        );
+    }
+    return specialist;
+};
+
+const parseHospitalType = (type: any): EntryType.Hospital => {
+    if (!type || !isEntryType(type) || type !== EntryType.Hospital) {
+        throw new Error(`Incorrect or missing entry type: ${type as string}`);
+    }
+    return type;
+};
+
+const parseHealthCheckType = (type: any): EntryType.HealthCheck => {
+    if (!type || !isEntryType(type) || type !== EntryType.HealthCheck) {
+        throw new Error(`Incorrect or missing entry type: ${type as string}`);
+    }
+    return type;
+};
+
+const parseOccupationalType = (type: any): EntryType.OccupationalHealthcare => {
+    if (
+        !type ||
+        !isEntryType(type) ||
+        type !== EntryType.OccupationalHealthcare
+    ) {
+        throw new Error(`Incorrect or missing entry type: ${type as string}`);
+    }
+    return type;
+};
+
+const isDischarge = (discharge: any): discharge is Discharge => {
+    if (
+        discharge.date &&
+        isDate(discharge.date) &&
+        discharge.criteria &&
+        isString(discharge.criteria)
+    )
+        return true;
+    return false;
+};
+
+const parseDischarge = (discharge: any): Discharge => {
+    if (!discharge || !isDischarge(discharge)) {
+        throw new Error(
+            `Incorrect or missing discharge: ${discharge as string}`
+        );
+    }
+    return discharge;
+};
+
+const parseEmployerName = (employerName: any): string => {
+    if (!employerName || !isString(employerName)) {
+        throw new Error(
+            `Incorrect or missing employer name: ${employerName as string}`
+        );
+    }
+    return employerName;
+};
+
+const isHealthCheckRating = (
+    healthCheckRating: any
+): healthCheckRating is HealthCheckRating => {
+    return Object.values(HealthCheckRating).includes(healthCheckRating);
+};
+
+const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
+    if (!healthCheckRating || !isHealthCheckRating(healthCheckRating)) {
+        throw new Error(
+            `Incorrect or missing healthcheck rating: ${
+                healthCheckRating as string
+            }`
+        );
+    }
+
+    return healthCheckRating;
+};
+
+export default { toNewPatientEntry, toNewEntry };
