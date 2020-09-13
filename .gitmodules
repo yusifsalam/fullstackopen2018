@@ -1,6 +1,7 @@
-[submodule "osa09/patientor"]
-	path = osa09/patientor
-	url = git@github.com:yusifsalam/patientor.git
+
 [submodule "osa10/rate-repository-app"]
 	path = osa10/rate-repository-app
 	url = git@github.com:yusifsalam/rate-repository-app.git
+[submodule "osa09/patientor"]
+	path = osa09/patientor
+	url = git@github.com:yusifsalam/patientor.git
